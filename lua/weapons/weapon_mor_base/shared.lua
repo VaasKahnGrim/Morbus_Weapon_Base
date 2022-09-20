@@ -1,5 +1,6 @@
 include("sh_sounds.lua")
 include("sh_animations.lua")
+include("sh_ammo.lua")
 include("sh_modes.lua")
 include("sh_laser.lua")
 
