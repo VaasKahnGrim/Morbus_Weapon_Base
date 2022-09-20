@@ -89,6 +89,7 @@ function SWEP:Think()
 		local wep = self.Weapon
 		Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNetworkedBool(wep, "Reloading") and false) or true )
 	end
+
 	self:IronSight()
 end
 
