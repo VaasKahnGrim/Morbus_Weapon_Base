@@ -77,18 +77,24 @@ SWEP.IsDropped				= false
 SWEP.CanBeSilenced			= false
 SWEP.AutoSpawnable			= false
 SWEP.ThinkOffset			= 0
+SWEP.UseLaser				= true
 
 SWEP.VElements				= {}
 SWEP.WElements				= {}
 
 function SWEP:Think()
-	if self.ThinkOffset < CurTime() then
+	if self.UseLaser and self.ThinkOffset < CurTime() then	--Allow players to disable the laser via toggling
 		self.ThinkOffset = CurTime() + 0.5
 
 		local wep = self.Weapon
-		Entity.SetNWBool(wep, "IsLaserOn", Entity.GetNetworkedBool(wep, "Reloading") and false or true )
+		Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNetworkedBool(wep, "Reloading") and false) or true )
 	end
 	self:IronSight()
+end
+
+function SWEP:ToggleLaser() --Not 100% tested yet
+	self.UseLaser = (self.UseLaser and true) or false
+	Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNWBool(wep, "IsLaserOn", false) and true) or false)	--Can we remove the need for using an NWBool possibly?
 end
 
 function SWEP:GetCapabilities()
