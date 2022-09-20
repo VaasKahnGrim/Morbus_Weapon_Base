@@ -1,5 +1,6 @@
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("sh_sounds.lua")
+AddCSLuaFile("sh_laser.lua")
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_laser.lua")
 AddCSLuaFile("cl_render.lua")
