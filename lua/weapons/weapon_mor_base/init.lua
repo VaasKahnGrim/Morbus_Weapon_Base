@@ -302,6 +302,25 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone)
 			return self:RicochetCallback(0, attacker, tracedata, dmginfo) 
 		end
 	})
+	
+	--Lookinto this later to fuck with nospread(and also see about making it not cancer/expensive)
+	--[[local bullet = {
+		Num 		= num_bullets,
+		Src 		= Player.GetShootPos(ply),			-- Source
+		Dir 		= Player.GetAimVector(ply),			-- Dir of bullet
+		Spread		= vector_origin, --Vector(aimcone, aimcone, 0),			-- Aim Cone
+		Tracer		= 1, 						-- Show a tracer on every x bullets
+		TracerName	= "Ar2Tracer",
+		Force		= damage * 0.5,					-- Amount of force to give to phys objects
+		Damage		= damage,
+		Callback	= function(attacker, tracedata, dmginfo) 
+			return self:RicochetCallback(0, attacker, tracedata, dmginfo) 
+		end
+	}
+	math.randomseed( CurTime() + math.sqrt( bullet.Dir.x ^ 2 * bullet.Dir.y ^ 2 * bullet.Dir.z ^ 2 ) )
+	bullet.Dir = bullet.Dir + Vector( spread.x * rand(), spread.y * rand(), spread.z * rand() )
+
+	Entity.FireBullets(ply, bullet)]]
 end
 
 function SWEP:PreDrop()
