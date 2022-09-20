@@ -1,4 +1,5 @@
 include("sh_sounds.lua")
+include("sh_animations.lua")
 include("sh_laser.lua")
 
 local Player = FindMetaTable("Player")
