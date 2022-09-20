@@ -1,5 +1,15 @@
 include("sh_sounds.lua")
 
+local Player = FindMetaTable("Player")
+local Entity = FindMetaTable("Entity")
+local Weapon = FindMetaTable("Weapon")
+local Vector = FindMetaTable("Vector")
+local Angle = FindMetaTable("Angle")
+local CTakeDamageInfo = FindMetaTable("CTakeDamageInfo")
+local CEffectData = FindMetaTable("CEffectData")
+local PhysObj = FindMetaTable("PhysObj")
+local vMatrix = FindMetaTable("VMatrix")
+
 SWEP.Category				= "Morbus Weapons"		-- Swep Categorie (You can type what your want)
 SWEP.PrintName				= "Morbus Weapon Base"
 SWEP.Author 				= "Remscar, Vaas Kahn Grim, Icemane;"				-- Author Name
@@ -73,10 +83,10 @@ SWEP.WElements				= {}
 
 function SWEP:Think()
 	if self.ThinkOffset < CurTime() then
-		self.ThinkOffset = CurTime()+0.5
+		self.ThinkOffset = CurTime() + 0.5
 
 		local wep = self.Weapon
-		wep:SetNWBool( "IsLaserOn", wep:GetNetworkedBool("Reloading") and false or true )
+		Entity.SetNWBool(wep, "IsLaserOn", Entity.GetNetworkedBool(wep, "Reloading") and false or true )
 	end
 	self:IronSight()
 end
@@ -91,9 +101,9 @@ function SWEP:Precache()
 end
 
 function SWEP:CanPrimaryAttack()
-	if self.Weapon:Clip1() <= 0 and self.Primary.ClipSize > -1 then
-		self.Weapon:SetNextPrimaryFire(CurTime() + 0.5)
-		self.Weapon:EmitSound("Weapons/ClipEmpty_Pistol.wav")
+	if Weapon.Clip1(self.Weapon) <= 0 and self.Primary.ClipSize > -1 then
+		Weapon.SetNextPrimaryFire(self.Weapon, CurTime() + 0.5)
+		Entity.EmitSound(self.Weapon, "Weapons/ClipEmpty_Pistol.wav")
 		return false
 	end
 
@@ -101,31 +111,29 @@ function SWEP:CanPrimaryAttack()
 end
 
 function SWEP:Deploy()
-	self.Weapon:SetNetworkedBool("Reloading", false)
+	Entity.SetNetworkedBool(self.Weapon, "Reloading", false)
 
 	self:SetIronsights(false, self.Owner)					-- Set the ironsight false
-	self.Weapon:SetNWBool( "IsLaserOn", true )
+	Entity.SetNWBool(self.Weapon, "IsLaserOn", true )
 
-	self.Weapon:SendWeaponAnim( self.Silenced and ACT_VM_DRAW_SILENCED or ACT_VM_DRAW )
-	self.ResetSights = CurTime() + self.Owner:GetViewModel():SequenceDuration()
+	Weapon.SendWeaponAnim(self.Weapon, self.Silenced and ACT_VM_DRAW_SILENCED or ACT_VM_DRAW )
+	self.ResetSights = CurTime() + Entity.SequenceDuration(self.Owner, Player.GetViewModel(self.Owner))
 
 	return true
 end
 
 function SWEP:ShootBulletInformation(ply)
-	local CurrentDamage
-	local CurrentRecoil
-	local CurrentCone
-	local useIronSights = (self:GetIronsights() == true and ply:KeyDown(IN_ATTACK2)) or false
+	local CurrentDamage, CurrentRecoil, CurrentCone
+	local useIronSights = (self:GetIronsights() == true and Player.KeyDown(ply, IN_ATTACK2)) or false
 
-	CurrentCone = useIronSights and self.Primary.Cone / 2 or self.PrimaryCone
+	CurrentCone = userIronSights and self.Primary.Cone / 2 or self.PrimaryCone
 
 	local damagedice = math.Rand(.85,1.15)
 
 	CurrentDamage = self.Primary.Damage * damagedice
 	CurrentRecoil = self.Primary.Recoil
 
-	CurrentRecoil = ply:KeyDown(IN_FORWARD or IN_BACK or IN_MOVELEFT or IN_MOVERIGHT) and self.Primary.Recoil * 2 or CurrentRecoil
+	CurrentRecoil = Player.KeyDown(ply, IN_FORWARD or IN_BACK or IN_MOVELEFT or IN_MOVERIGHT) and self.Primary.Recoil * 2 or CurrentRecoil
 
 	self:ShootBullet(CurrentDamage, useIronSights and CurrentRecoil / 4 or CurrentRecoil, self.Primary.NumShots, CurrentCone)
 end
@@ -133,7 +141,7 @@ end
 function SWEP:GetViewModelPosition(pos, ang)
 	if not self.IronSightsPos then return pos, ang end
 
-	local bIron = self.Weapon:GetNWBool("Ironsights")
+	local bIron = Entity.GetNWBool(self.Weapon, "Ironsights")
 
 	if bIron ~= self.bLastIron then
 		self.bLastIron = bIron
@@ -154,18 +162,18 @@ function SWEP:GetViewModelPosition(pos, ang)
 		if not bIron then Mul = 1 - Mul end
 	end
 
-	local Offset	= self.IronSightsPos
+	local Offset = self.IronSightsPos
 
 	if self.IronSightsAng then
 		ang = ang * 1
-		ang:RotateAroundAxis(ang:Right(), 		self.IronSightsAng.x * Mul)
-		ang:RotateAroundAxis(ang:Up(), 		self.IronSightsAng.y * Mul)
-		ang:RotateAroundAxis(ang:Forward(), 	self.IronSightsAng.z * Mul)
+		Angle.RotateAroundAxis(ang, Angle.Right(ang), self.IronSightsAng.x * Mul)
+		Angle.RotateAroundAxis(ang, Angle.Up(ang), self.IronSightsAng.y * Mul)
+		Angle.RotateAroundAxis(ang, Angle.Forward(ang), self.IronSightsAng.z * Mul)
 	end
 
-	local Right 	= ang:Right()
-	local Up 		= ang:Up()
-	local Forward 	= ang:Forward()
+	local Right 	= Angle.Right(ang)
+	local Up 		= Angle.Up(ang)
+	local Forward 	= Angle.Forward(ang)
 
 	pos = pos + Offset.x * Right * Mul
 	pos = pos + Offset.y * Forward * Mul
@@ -175,26 +183,24 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetIronsights(b)
-	self.Weapon:SetNetworkedBool("Ironsights", b)
+	Entity.SetNetworkedBool(self.Weapon, "Ironsights", b)
 end
 
 function SWEP:GetIronsights()
-	return self.Weapon:GetNWBool("Ironsights")
+	return Entity.GetNWBool(self.Weapon, "Ironsights")
 end
 
 function SWEP:Ammo1()
-	return IsValid(self.Owner) and self.Owner:GetAmmoCount(self.Primary.Ammo) or false
+	return Entity.IsValid(self.Owner) and Player.GetAmmoCount(self.Owner, self.Primary.Ammo) or false
 end
 
 function SWEP:DampenDrop()
-	local phys = self:GetPhysicsObject()
-	if not IsValid(phys) then return end
-	phys:SetVelocityInstantaneous(Vector(0,0,-75) + phys:GetVelocity() * 0.001)
-	phys:AddAngleVelocity(phys:GetAngleVelocity() * -0.99)
+	local phys = Entity.GetPhysicsObject(self)
+	if not Entity.IsValid(phys) then return end
+	PhysObj.SetVelocityInstantaneous(phys, Vector(0,0,-75) + PhysObj.GetVelocity(phys) * 0.001)
+	PhysObj.AddAngleVelocity(phys, PhysObj.GetAngleVelocity(phys) * -0.99)
 end
 
 function SWEP:IsEquipment()
 	return WEPS.IsEquipment(self)
 end
-
-
