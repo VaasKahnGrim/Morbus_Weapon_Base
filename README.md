@@ -4,13 +4,13 @@ A weapon base specifically designed for morbus gamemode. Its was originally a mo
 
 
 # TODO:
-1. cl_viewbob.lua(file made, not started)
-2. test toggling lasersight feature(started)
+1. cl_viewbob.lua   (file made, not started)
+2. test toggling lasersight feature   (started)
 3. weapon damage based on ammo types
 4. weapon safety mode
-5. firemodes(auto, semi, burst)
+5. firemodes   (auto, semi, burst)
 6. possibly visual effects such as tracers, muzzle flash, muzzle smoke, ect
-7. animation code for occassional idle animations and other things relating to animations(file made, not started)
+7. animation code for occassional idle animations and other things relating to animations   (file made, not started)
 8. rework ironsights code to improve performance and functionality
 9. new melee weapon base
 10. throwable weapon base
