@@ -1,9 +1,11 @@
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("sh_sounds.lua")
+AddCSLuaFile("sh_animations.lua")
 AddCSLuaFile("sh_laser.lua")
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_laser.lua")
 AddCSLuaFile("cl_render.lua")
+AddCSLuaFile("cl_viewbob.lua")
 include("shared.lua")
 
 local Player = FindMetaTable("Player")
