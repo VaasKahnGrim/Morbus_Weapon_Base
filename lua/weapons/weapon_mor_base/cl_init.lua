@@ -1,6 +1,7 @@
 include("shared.lua")
 include("cl_laser.lua")
 include("cl_render.lua")
+include("cl_viewbob.lua")
 
 local Player = FindMetaTable("Player")
 local Entity = FindMetaTable("Entity")
