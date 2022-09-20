@@ -1,5 +1,8 @@
 # Morbus_Weapon_Base
 A weapon base specifically designed for morbus gamemode. Its was originally a modified version of M9K that was outdated. Now much more organized and efficient.
+This weapon base will eventually be populated with additional features, improvements and performance enhancements as time goes on so that servers actually have a proper weapon base to use.
+
+It will even support SWEP Construction Kit, you know....if you use that thing.
 
 
 
