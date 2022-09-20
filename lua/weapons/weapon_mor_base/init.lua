@@ -72,10 +72,6 @@ function SWEP:IronSight()
     self.BobScale = Player.KeyDown(ply, IN_ATTACK2) and not Player.KeyDown(ply, IN_USE) and not Player.KeyDown(ply, IN_SPEED) and 0.05 or 1.0
 end
 
-function SWEP:ToggleLaser() --Not 100% tested yet
-	Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNWBool(wep, "IsLaserOn", false) and true) or false)
-end
-
 function SWEP:Reload()
 	local ply = Entity.GetOwner(self)
 	local wep = self.Weapon
