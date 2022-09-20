@@ -72,6 +72,10 @@ function SWEP:IronSight()
     self.BobScale = Player.KeyDown(ply, IN_ATTACK2) and not Player.KeyDown(ply, IN_USE) and not Player.KeyDown(ply, IN_SPEED) and 0.05 or 1.0
 end
 
+function SWEP:ToggleLaser() --Not 100% tested yet
+	Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNWBool(wep, "IsLaserOn", false) and true) or false)
+end
+
 function SWEP:Reload()
 	local ply = Entity.GetOwner(self)
 	local wep = self.Weapon
@@ -81,7 +85,7 @@ function SWEP:Reload()
 	self.ResetSights = CurTime() + Entity.SequenceDuration(ply, Player.GetViewModel(ply))
 
 	if wep ~= nil then
-		if ( Weapon.Clip1(wep) < self.Primary.ClipSize ) then
+		if Weapon.Clip1(wep) < self.Primary.ClipSize then
 		-- When the current clip < full clip and the rest of your ammo > 0, then
 			Player.SetFOV( ply, 0, 0.3 )
 			-- Zoom = 0
