@@ -7,6 +7,7 @@ AddCSLuaFile("sh_ammo.lua")
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_laser.lua")
 AddCSLuaFile("cl_render.lua")
+AddCSLuaFile("cl_effects.lua")
 AddCSLuaFile("cl_viewbob.lua")
 include("shared.lua")
 
