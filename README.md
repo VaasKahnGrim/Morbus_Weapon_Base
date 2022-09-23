@@ -8,10 +8,10 @@ It will even support SWEP Construction Kit, you know....if you use that thing.
 
 # TODO:
 	1. cl_viewbob.lua(file made, not started)
-	2. test toggling lasersight feature   (started)
-	3. weapon damage based on ammo types   (file made, not started)
-	4. firemodes   (auto, semi, burst, safety)   (file made, not started)
-	5. possibly visual effects such as tracers, muzzle flash, muzzle smoke, ect   (file made, not started)
+	2. test toggling lasersight feature   (done, needs testing)
+	3. weapon damage based on ammo types   (file made, not fully implemented)
+	4. firemodes   (auto, semi, burst, safety)   (file made, not fully implemented)
+	5. possibly visual effects such as tracers, muzzle flash, muzzle smoke, ect   (file made, not fully implemented)
 	6. animation code for occassional idle animations and other things relating to animations   (file made, not started)
 	7. rework ironsights code to improve performance and functionality
 	8. new melee weapon base
