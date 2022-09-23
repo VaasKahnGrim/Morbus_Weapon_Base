@@ -1,4 +1,5 @@
---not fully implemented yet
+--Not Fully implemented
+--Need to get material type and use that to implement impact effects when hitting an object or player
 local ImpactTypes = {	--Change these asap
 	["Default"] = "fadingscorch",
 	["9mm"] = "fadingscorch",
