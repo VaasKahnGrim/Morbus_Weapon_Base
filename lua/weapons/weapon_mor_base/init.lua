@@ -29,6 +29,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:IronSight()
+	if self:IsSafetyOn() then return end
 	local ply = Entity.GetOwner(self)
 	local wep = self.Weapon
 	local isReloading = Entity.GetNWBool(wep, "Reloading")
@@ -79,6 +80,7 @@ function SWEP:IronSight()
 end
 
 function SWEP:Reload()
+	if self:IsSafetyOn() then return end
 	local ply = Entity.GetOwner(self)
 	local wep = self.Weapon
 
@@ -140,6 +142,7 @@ function SWEP:PostReloadScopeCheck()
 end
 
 function SWEP:CanPrimaryAttack()
+	if self:IsSafetyOn() then return false end
 	if Weapon.Clip1(self.Weapon) <= 0 and self.Primary.ClipSize > -1 then
 		Weapon.SetNextPrimaryFire(self.Weapon, CurTime() + 0.5)
 		Entity.EmitSound(self.Weapon, "Weapons/ClipEmpty_Pistol.wav")
