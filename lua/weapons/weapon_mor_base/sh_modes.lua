@@ -7,19 +7,19 @@ FIREMODE_SAFETY = 3
 
 SWEP.FireMode = 0
 SWEP.FireModes = {
-  [FIREMODE_SAFETY] = true  --All weapons have this firemode
+	[FIREMODE_SAFETY] = true  --All weapons have this firemode
 }
 
 function SWEP:SetFireMode(mode)
-    self.FireModes = self.FireModes[mode] and mode or self.FireModes
+	self.FireModes = self.FireModes[mode] and mode or self.FireModes
 end
 
 function SWEP:GetFireMode()
-  return self.FireMode or 0
+	return self.FireMode or 0
 end
 
 function SWEP:IsSafetyOn()
-  return (self.FireMode == 3) or false
+	return (self.FireMode == 3) or false
 end
 
 
