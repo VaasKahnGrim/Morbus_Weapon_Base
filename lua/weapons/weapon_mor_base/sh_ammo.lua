@@ -11,7 +11,7 @@ local AmmoTypes = {
 }
 
 function SWEP:SetupDamage()
-	self.Primary.Damage = AmmoTypes[self.Primary.Round] or AmmoTypes.Default or 10
+	self.Primary.Damage = AmmoTypes[self.Round] or AmmoTypes.Default or 10
 end
 
 
