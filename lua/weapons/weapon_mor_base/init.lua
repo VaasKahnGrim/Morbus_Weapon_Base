@@ -364,7 +364,7 @@ function SWEP:Equip(newowner)
 		local ammo = Player.GetAmmoCount(newowner, self.Primary.Ammo)
 		local given = math.min(self.StoredAmmo, (self.Primary.ClipSize*3) - ammo)
 
-		Player.GiveAmmo(newammo, given, self.Primary.Ammo)
+		Player.GiveAmmo(newowner, ammo, given, self.Primary.Ammo)
 		self.StoredAmmo = 0
 	end
 end
