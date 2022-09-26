@@ -17,6 +17,7 @@ It will even support SWEP Construction Kit, you know....if you use that thing.
 	8. new melee weapon base
 	9. throwable weapon base
 	10. equipment weapon base
+	11. REMOVE DEPROCATED FUNCTIONS, VARIABLES, LIBRARIES AND PRACTICES!!!!!
 
 
 # Credits:
