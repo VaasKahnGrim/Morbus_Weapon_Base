@@ -89,9 +89,7 @@ SWEP.WElements				= {}
 function SWEP:Think()
 	if self.UseLaser and self.ThinkOffset < CurTime() then	--Allow players to disable the laser via toggling
 		self.ThinkOffset = CurTime() + 0.5
-
-		local wep = self.Weapon
-		Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNetworkedBool(wep, "Reloading") and false) or true )
+		Entity.SetNWBool(self, "IsLaserOn", (Entity.GetNetworkedBool(self, "Reloading") and false) or true )
 	end
 
 	self:IronSight()
@@ -99,7 +97,7 @@ end
 
 function SWEP:ToggleLaser() --Not 100% tested yet
 	self.UseLaser = (self.UseLaser and true) or false
-	Entity.SetNWBool(wep, "IsLaserOn", (Entity.GetNWBool(wep, "IsLaserOn", false) and true) or false)	--Can we remove the need for using an NWBool possibly?
+	Entity.SetNWBool(self, "IsLaserOn", (Entity.GetNWBool(self, "IsLaserOn", false) and true) or false)	--Can we remove the need for using an NWBool possibly?
 end
 
 function SWEP:GetCapabilities()
@@ -113,8 +111,8 @@ end
 
 function SWEP:CanPrimaryAttack()
 	if Weapon.Clip1(self.Weapon) <= 0 and self.Primary.ClipSize > -1 then
-		Weapon.SetNextPrimaryFire(self.Weapon, CurTime() + 0.5)
-		Entity.EmitSound(self.Weapon, "Weapons/ClipEmpty_Pistol.wav")
+		Weapon.SetNextPrimaryFire(self, CurTime() + 0.5)
+		Entity.EmitSound(self, "Weapons/ClipEmpty_Pistol.wav")
 		return false
 	end
 
@@ -122,13 +120,13 @@ function SWEP:CanPrimaryAttack()
 end
 
 function SWEP:Deploy()
-	Entity.SetNetworkedBool(self.Weapon, "Reloading", false)
+	Entity.SetNetworkedBool(self, "Reloading", false)
 
-	self:SetIronsights(false, self.Owner)					-- Set the ironsight false
-	Entity.SetNWBool(self.Weapon, "IsLaserOn", true )
+	self:SetIronsights(false, Entity.GetOwner(self))					-- Set the ironsight false
+	Entity.SetNWBool(self, "IsLaserOn", true )
 
-	Weapon.SendWeaponAnim(self.Weapon, self.Silenced and ACT_VM_DRAW_SILENCED or ACT_VM_DRAW )
-	self.ResetSights = CurTime() + Entity.SequenceDuration(self.Owner, Player.GetViewModel(self.Owner))
+	Weapon.SendWeaponAnim(self, self.Silenced and ACT_VM_DRAW_SILENCED or ACT_VM_DRAW )
+	self.ResetSights = CurTime() + Entity.SequenceDuration(Entity.GetOwner(self), Player.GetViewModel(Entity.GetOwner(self)))
 
 	return true
 end
@@ -152,7 +150,7 @@ end
 function SWEP:GetViewModelPosition(pos, ang)
 	if not self.IronSightsPos then return pos, ang end
 
-	local bIron = Entity.GetNWBool(self.Weapon, "Ironsights")
+	local bIron = Entity.GetNWBool(self, "Ironsights")
 
 	if bIron ~= self.bLastIron then
 		self.bLastIron = bIron
@@ -194,15 +192,15 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetIronsights(b)
-	Entity.SetNetworkedBool(self.Weapon, "Ironsights", b)
+	Entity.SetNetworkedBool(self, "Ironsights", b)
 end
 
 function SWEP:GetIronsights()
-	return Entity.GetNWBool(self.Weapon, "Ironsights")
+	return Entity.GetNWBool(self, "Ironsights")
 end
 
 function SWEP:Ammo1()
-	return Entity.IsValid(self.Owner) and Player.GetAmmoCount(self.Owner, self.Primary.Ammo) or false
+	return Entity.IsValid(Entity.GetOwner(self)) and Player.GetAmmoCount(Entity.GetOwner(self), self.Primary.Ammo) or false
 end
 
 function SWEP:DampenDrop()
@@ -215,3 +213,5 @@ end
 function SWEP:IsEquipment()
 	return WEPS.IsEquipment(self)
 end
+
+
