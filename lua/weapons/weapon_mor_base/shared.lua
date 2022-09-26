@@ -110,7 +110,7 @@ function SWEP:Precache()
 end
 
 function SWEP:CanPrimaryAttack()
-	if Weapon.Clip1(self.Weapon) <= 0 and self.Primary.ClipSize > -1 then
+	if Weapon.Clip1(self) <= 0 and self.Primary.ClipSize > -1 then
 		Weapon.SetNextPrimaryFire(self, CurTime() + 0.5)
 		Entity.EmitSound(self, "Weapons/ClipEmpty_Pistol.wav")
 		return false
