@@ -25,14 +25,13 @@ function SWEP:Initialize()
 	util.PrecacheSound(self.Primary.Sound)
 	self.Reloadaftershoot = 0 				-- Can't reload when firing
 	self:SetWeaponHoldType(self.HoldType)
-	Entity.SetNetworkedBool( self.Weapon, "Reloading", false)
+	Entity.SetNetworkedBool( self, "Reloading", false)
 end
 
 function SWEP:IronSight()
 	if self:IsSafetyOn() then return end
 	local ply = Entity.GetOwner(self)
-	local wep = self.Weapon
-	local isReloading = Entity.GetNWBool(wep, "Reloading")
+	local isReloading = Entity.GetNWBool(self, "Reloading")
 	local curt = CurTime()
 
 	if self.ResetSights and curt >= self.ResetSights then
@@ -47,7 +46,7 @@ function SWEP:IronSight()
 	end
 
 	if Player.KeyDown(ply, IN_SPEED) and not isReloading then -- If you are running
-		Weapon.SetNextPrimaryFire(wep, curt + 0.3) -- Make it so you can't shoot for another quarter second
+		Weapon.SetNextPrimaryFire(self, curt + 0.3) -- Make it so you can't shoot for another quarter second
 		self.IronSightsPos = self.RunSightsPos -- Hold it down
 		self.IronSightsAng = self.RunSightsAng -- Hold it down
 		self:SetIronsights(true, ply) -- Set the ironsight true
@@ -82,30 +81,28 @@ end
 function SWEP:Reload()
 	if self:IsSafetyOn() then return end
 	local ply = Entity.GetOwner(self)
-	local wep = self.Weapon
 
-	Weapon.DefaultReload(wep, self.Silenced and ACT_VM_RELOAD_SILENCED or ACT_VM_RELOAD) 
+	Weapon.DefaultReload(self, self.Silenced and ACT_VM_RELOAD_SILENCED or ACT_VM_RELOAD) 
 
 	self.ResetSights = CurTime() + Entity.SequenceDuration(ply, Player.GetViewModel(ply))
 
-	if wep ~= nil then
-		if Weapon.Clip1(wep) < self.Primary.ClipSize then
+	if Entity.IsValid(self) then
+		if Weapon.Clip1(self) < self.Primary.ClipSize then
 		-- When the current clip < full clip and the rest of your ammo > 0, then
 			Player.SetFOV( ply, 0, 0.3 )
 			-- Zoom = 0
 			self:SetIronsights(false)
 			-- Set the ironsight to false
-			Entity.SetNetworkedBool(wep, "Reloading", true)
+			Entity.SetNetworkedBool(self, "Reloading", true)
 		end
 
 		local waitdammit = Entity.SequenceDuration(ply, Player.GetViewModel(ply))
 		timer.Simple(waitdammit + .1, function() 
-			if wep == nil then return end --why.. this is already being checked, whatever
+			if Entity.IsValid(self) then return end --why.. this is already being checked, whatever
 			if not Entity.IsValid(ply) then return end
 			if not ply.KeyDown then return end
-			Entity.SetNetworkedBool(wep, "Reloading", false)
-			if Player.KeyDown(ply, IN_ATTACK2) and Entity.GetClass(wep) == self.Gun then 
-				if CLIENT then return end
+			Entity.SetNetworkedBool(self, "Reloading", false)
+			if Player.KeyDown(ply, IN_ATTACK2) and Entity.GetClass(self) == self.Gun then 
 				if self.Scoped == false then
 					Player.SetFOV( ply, 0, 0.3 )
 					self.IronSightsPos = self.SightsPos					-- Bring it up
@@ -123,15 +120,14 @@ function SWEP:Reload()
 end
 
 function SWEP:PostReloadScopeCheck()
-	if self.Weapon == nil then return end
-	Entity.SetNetworkedBool(self.Weapon, "Reloading", false)
-	if Player.KeyDown(self.Owner, IN_ATTACK2) and Entity.GetClass(self.Weapon) == self.Gun then 
-		if CLIENT then return end
+	if Entity.IsValid(self) then return end
+	Entity.SetNetworkedBool(self, "Reloading", false)
+	if Player.KeyDown(Entity.GetOwner(self), IN_ATTACK2) and Entity.GetClass(self) == self.Gun then 
 		if self.Scoped == false then
-			Player.SetFOV( self.Owner, self.Secondary.IronFOV, 0.3 )
+			Player.SetFOV( Entity.GetOwner(self), self.Secondary.IronFOV, 0.3 )
 			self.IronSightsPos = self.SightsPos					-- Bring it up
 			self.IronSightsAng = self.SightsAng					-- Bring it up
-			self:SetIronsights(true, self.Owner)
+			self:SetIronsights(true, Entity.GetOwner(self))
 			self.DrawCrosshair = false
 		else
 			return
@@ -143,9 +139,9 @@ end
 
 function SWEP:CanPrimaryAttack()
 	if self:IsSafetyOn() then return false end
-	if Weapon.Clip1(self.Weapon) <= 0 and self.Primary.ClipSize > -1 then
-		Weapon.SetNextPrimaryFire(self.Weapon, CurTime() + 0.5)
-		Entity.EmitSound(self.Weapon, "Weapons/ClipEmpty_Pistol.wav")
+	if Weapon.Clip1(self) <= 0 and self.Primary.ClipSize > -1 then
+		Weapon.SetNextPrimaryFire(self, CurTime() + 0.5)
+		Entity.EmitSound(self, "Weapons/ClipEmpty_Pistol.wav")
 		return false
 	end
 
@@ -157,18 +153,17 @@ function SWEP:PrimaryAttack()
 
 	if self:CanPrimaryAttack() and Entity.WaterLevel(ply) < 3 then
 		if not Player.KeyDown(ply, IN_SPEED) and not Player.KeyDown(ply, IN_RELOAD) then
-			local wep = self.Weapon
 			local silenced = self.Silenced
 		
 			self:ShootBulletInformation(ply)
-			wep:TakePrimaryAmmo(1)
+			self:TakePrimaryAmmo(1)
 			
-			Weapon.SendWeaponAnim(self.Weapon, silenced and ACT_VM_PRIMARYATTACK_SILENCED or ACT_VM_PRIMARYATTACK )
-			Entity.EmitSound(self.Weapon, silenced and self.Primary.SilencedSound or self.Primary.Sound, silenced and 75 or 135, 100)
+			Weapon.SendWeaponAnim(self, silenced and ACT_VM_PRIMARYATTACK_SILENCED or ACT_VM_PRIMARYATTACK )
+			Entity.EmitSound(self, silenced and self.Primary.SilencedSound or self.Primary.Sound, silenced and 75 or 135, 100)
 
 			Entity.SetAnimation( ply, PLAYER_ATTACK1 )
 			Entity.MuzzleFlash(ply)
-			Weapon.SetNextPrimaryFire(wep, CurTime()+1/(self.Primary.RPM/60))
+			Weapon.SetNextPrimaryFire(self, CurTime()+1/(self.Primary.RPM/60))
 			self.RicochetCoin = (math.random(1,4))
 			self:BoltBack()
 		end
@@ -180,14 +175,14 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:Holster()
-	Entity.SetNetworkedBool(self.Weapon, "Reloading", false)
-	Entity.SetNWBool( self.Weapon, "IsLaserOn", false )
+	Entity.SetNetworkedBool(self, "Reloading", false)
+	Entity.SetNWBool( self, "IsLaserOn", false )
 
 	return true
 end
 
 function SWEP:OnRemove()
-	Entity.SetNetworkedBool(self.Weapon, "Reloading", false)
+	Entity.SetNetworkedBool(self, "Reloading", false)
 end
 
 local ricoJump = {
@@ -207,10 +202,8 @@ function SWEP:RicochetCallback(bouncenum, attacker, tr, dmginfo)
 	
 	-- Your screen will shake and you'll hear the savage hiss of an approaching bullet which passing if someone is shooting at you.
 	if tr.MatType ~= MAT_METAL then
-	
 		util.ScreenShake(tr.HitPos, 5, 0.1, 0.5, 64)
 		sound.Play("Bullets.DefaultNearmiss", tr.HitPos, 250, math.random(110, 180))
-	
 
 		local effectdata = EffectData()
 		CEffectData.SetOrigin(effectdata, tr.HitPos)
@@ -259,19 +252,18 @@ end
 
 function SWEP:BoltBack()
 	local ply = Entity.GetOwner(self)
-	local wep = self.Weapon
 
-	if self.BoltAction and Weapon.Clip1(wep) > 0 or Player.GetAmmoCount( ply, Weapon.GetPrimaryAmmoType(wep) ) > 0 then
+	if self.BoltAction and Weapon.Clip1(self) > 0 or Player.GetAmmoCount( ply, Weapon.GetPrimaryAmmoType(self) ) > 0 then
 		timer.Simple(.25, function() 
-			if wep ~= nil then 
-				if Entity.GetClass(wep) == self.Gun and self.BoltAction and (self:GetIronsights() == true) then
+			if Entity.IsValid(self) then 
+				if Entity.GetClass(self) == self.Gun and self.BoltAction and (self:GetIronsights() == true) then
 					Player.SetFOV( ply, 0, 0.3 )
 					self:SetIronsights(false)
 					Player.DrawViewModel( ply, true )
 					local boltactiontime = Entity.SequenceDuration(ply, Player.GetViewModel(ply))
 					timer.Simple(boltactiontime + .1, function()
-						if wep ~= nil then
-							if Player.KeyDown(ply, IN_ATTACK2) and Entity.GetClass(wep) == self.Gun then 
+						if Entity.IsValid(self) then
+							if Player.KeyDown(ply, IN_ATTACK2) and Entity.GetClass(self) == self.Gun then 
 								Player.SetFOV( ply, 75/self.Secondary.ScopeZoom, 0.15 )                      		
 								self.IronSightsPos = self.SightsPos					-- Bring it up
 								self.IronSightsAng = self.SightsAng					-- Bring it up
@@ -332,14 +324,14 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone)
 end
 
 function SWEP:PreDrop()
-	if not Entity.IsValid(self.Owner) or self.Primary.Ammo == "none" then
+	if not Entity.IsValid(Entity.GetOwner(self)) or self.Primary.Ammo == "none" then
 		return
 	end
 
 	local ammo = self:Ammo1()
 
 	-- Do not drop ammo if we have another gun that uses this type
-	local wep = Player.GetWeapons(self.Owner)
+	local wep = Player.GetWeapons(Entity.GetOwner(self))
 	local wepLen = #wep
 
 	for i = 1, wepLen do
@@ -352,7 +344,7 @@ function SWEP:PreDrop()
 
 	if ammo <= 0 then return end
 
-	Player.RemoveAmmo(self.Owner, ammo, self.Primary.Ammo)
+	Player.RemoveAmmo(Entity.GetOwner(self), ammo, self.Primary.Ammo)
 end
 
 function SWEP:Equip(newowner)
@@ -368,3 +360,5 @@ function SWEP:Equip(newowner)
 		self.StoredAmmo = 0
 	end
 end
+
+
